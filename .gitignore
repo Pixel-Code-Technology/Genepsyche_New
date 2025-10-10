@@ -1,26 +1,60 @@
-# Node.js dependencies
+# === Node & React ===
 node_modules/
-
-# Build output
-dist/
-build/
-
-# Logs
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
-# Environment files
+# === Build Output ===
+dist/
+build/
+.cache/
+.temp/
+.next/
+out/
+coverage/
+
+# === Environment & Config ===
 .env
 .env.local
-.env.*.local
+.env.development.local
+.env.test.local
+.env.production.local
 
-# OS-specific files
+# === System Files ===
 .DS_Store
 Thumbs.db
 
-# Editor directories and files
+# === IDE / Editor ===
 .vscode/
 .idea/
 *.swp
+*.swo
+*.swn
+*.bak
+
+# === Logs ===
+logs/
+*.log
+*.log.*
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# === Misc ===
+*.tgz
+*.tar.gz
+*.zip
+*.rar
+
+# === Testing ===
+jest-html-reporters-*.html
+test-results/
+cypress/videos/
+cypress/screenshots/
+
+# === Local Dev ===
+.tmp/
+local_settings.py
+.cache-loader/
