@@ -84,27 +84,24 @@ const Payments = () => {
   return (
     <div className="payments-page">
       {/* ==== HEADER CONTROLS ==== */}
-      <div className="table-controls">
-        <ShowSelect value={showItems} onChange={setShowItems} max={100} step={5} />
-        <div className="flex gap-3 items-center">
-          <input
+      <div className="page-header">
+        <ShowSelect value={showItems} onChange={setShowItems} />
+        <input
             type="text"
             placeholder="Search payments, patient, or code..."
             className="search-input"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
-          <button
+        <button className="create-btn"
             onClick={() => {
               setMode("create");
               setSelectedPayment(null);
               setShowPaymentForm(true);
             }}
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
           >
             + Add Payment
           </button>
-        </div>
       </div>
 
       {/* ==== FORM POPUP ==== */}
@@ -178,7 +175,7 @@ const Payments = () => {
                           setSelectedPayment(p);
                           setShowPaymentForm(true);
                         }}
-                        className="text-blue-600 hover:underline"
+                        className="action-btn"
                       >
                         View
                       </button>
@@ -190,7 +187,7 @@ const Payments = () => {
                           setSelectedPayment(p);
                           setShowPaymentForm(true);
                         }}
-                        className="text-green-600 hover:underline"
+                        className="action-btn"
                       >
                         Edit
                       </button>
@@ -198,7 +195,7 @@ const Payments = () => {
                       {/* Delete */}
                       <button
                         onClick={() => handleDelete(p.id)}
-                        className="text-red-600 hover:underline"
+                        className="action-btn delete"
                       >
                         Delete
                       </button>
