@@ -2,8 +2,9 @@ import React, { useState, useEffect } from "react";
 import CreateScheduleForm from "./CreateScheduleForm";
 import { SERVICES } from "../constants";
 
-const API_SCHEDULES = "http://localhost:3000/api/schedules";
-const API_PATIENTS = "http://localhost:3000/api/patients";
+const API_BASE = "http://localhost:3000/api"; // ✅ unified base URL
+const API_SCHEDULES = `${API_BASE}/schedules`;
+const API_PATIENTS = `${API_BASE}/patients`;
 
 const ScheduleList = () => {
   const [schedules, setSchedules] = useState([]);
@@ -40,7 +41,7 @@ const ScheduleList = () => {
     }
   };
 
-  // ✅ CRUD Handlers
+  // ✅ Create Schedule
   const handleCreateSchedule = async (scheduleData) => {
     try {
       const res = await fetch(API_SCHEDULES, {
@@ -55,6 +56,7 @@ const ScheduleList = () => {
     }
   };
 
+  // ✅ Update Schedule
   const handleUpdateSchedule = async (updatedData) => {
     try {
       const res = await fetch(`${API_SCHEDULES}/${updatedData.id}`, {
@@ -69,6 +71,7 @@ const ScheduleList = () => {
     }
   };
 
+  // ✅ Delete Schedule
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this schedule?")) return;
     try {
@@ -91,16 +94,38 @@ const ScheduleList = () => {
     return s ? s.name : "Unknown";
   };
 
+  // ✅ Status Change (inline)
+  const handleStatusChange = async (id, newStatus) => {
+    try {
+      const response = await fetch(`${API_SCHEDULES}/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ status: newStatus }),
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        setSchedules((prev) =>
+          prev.map((s) => (s.id === id ? { ...s, status: newStatus } : s))
+        );
+      }
+    } catch (error) {
+      console.error("Failed to update status:", error);
+    }
+  };
+
+  // ✅ Render UI
   return (
     <div className="schedule-page">
-      {/* ✅ Main Content */}
       {loading ? (
         <p>Loading schedules...</p>
       ) : error ? (
         <p className="error-text">{error}</p>
       ) : (
         <div className="schedule-table">
-          {/* ✅ Table Header (7 columns) */}
+          {/* Header */}
           <div className="table-header">
             <div>TITLE</div>
             <div>PATIENT</div>
@@ -111,7 +136,7 @@ const ScheduleList = () => {
             <div>ACTIONS</div>
           </div>
 
-          {/* ✅ Table Rows */}
+          {/* Rows */}
           {schedules.length === 0 ? (
             <div className="empty-state">No schedules found.</div>
           ) : (
@@ -130,9 +155,20 @@ const ScheduleList = () => {
                     {s.startTime} – {s.endTime}
                   </span>
                 </div>
-                <div className={`status ${s.status}`}>
-                  {s.status?.toUpperCase()}
-                </div>
+
+                {/* ✅ Status Dropdown */}
+                <select
+                  value={s.status}
+                  onChange={(e) => handleStatusChange(s.id, e.target.value)}
+                  className="status-dropdown"
+                >
+                  <option value="Scheduled">Scheduled</option>
+                  <option value="Initial Session">Initial Session</option>
+                  <option value="Claim Submission">Claim Submission</option>
+                  <option value="Follow Up">Follow Up</option>
+                  <option value="Cancel Appointment">Cancel Appointment</option>
+                </select>
+
                 <div className="schedule-actions">
                   <button
                     className="action-btn"
@@ -156,7 +192,7 @@ const ScheduleList = () => {
         </div>
       )}
 
-      {/* ✅ Modal Form */}
+      {/* Modal Form */}
       {showForm && (
         <CreateScheduleForm
           selectedDate={new Date()}

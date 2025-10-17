@@ -40,8 +40,14 @@ const Schedule = sequelize.define('Schedule', {
     type: DataTypes.TEXT,
   },
   status: {
-    type: DataTypes.ENUM('booked', 'available', 'cancelled'),
-    defaultValue: 'available',
+  type: DataTypes.ENUM(
+    'Scheduled',
+    'Initial Session',
+    'Claim Submission',
+    'Follow Up',
+    'Cancel Appointment'
+  ),
+  defaultValue: 'Scheduled',
   },
 }, {
   tableName: 'schedules',
