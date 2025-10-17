@@ -4,10 +4,11 @@ const router = express.Router();
 const controller = require('./controller');
 
 // CRUD Routes
-router.post('/schedules', controller.createSchedule);
-router.get('/schedules', controller.getAllSchedules);
-router.get('/schedules/:id', controller.getScheduleById);
-router.put('/schedules/:id', controller.updateSchedule);
-router.delete('/schedules/:id', controller.deleteSchedule);
+router.post('/', controller.createSchedule);
+router.get('/', controller.getAllSchedules);
+router.get('/:id', controller.getScheduleById);
+router.put('/:id', controller.updateSchedule);
+router.delete('/:id', controller.deleteSchedule);
+
 
 module.exports = router;

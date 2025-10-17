@@ -3,11 +3,11 @@ const express = require('express');
 const router = express.Router();
 const controller = require('./controller');
 
-// ✅ Correct REST API routes
-router.post('/patients', controller.createPatient);
-router.get('/patients', controller.getAllPatients);
-router.get('/patients/:id', controller.getPatientById);
-router.put('/patients/:id', controller.updatePatient);
-router.delete('/patients/:id', controller.deletePatient);
+// ✅ REST API routes — no duplicate prefix
+router.post('/', controller.createPatient);
+router.get('/', controller.getAllPatients);
+router.get('/:id', controller.getPatientById);
+router.put('/:id', controller.updatePatient);
+router.delete('/:id', controller.deletePatient);
 
 module.exports = router;

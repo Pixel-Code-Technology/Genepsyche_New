@@ -1,26 +1,26 @@
 import React from "react";
 
-const PopularServices = () => {
-  const services = [
-    { name: "Telehealth", patients: 3200 },
-    { name: "Psychotherapy", patients: 2800 },
-    { name: "Depression", patients: 1950 },
-    { name: "Medication Management", patients: 1250 },
-    { name: "Eating Disorder", patients: 850 },
-    { name: "Psychosis", patients: 350 },
-  ];
-
-  const totalPatients = 10400;
+const PopularServices = ({ services = [] }) => {
+  const totalCount = services.reduce(
+    (sum, item) => sum + parseInt(item.count || 0),
+    0
+  );
 
   return (
     <div className="chart-container">
       <h3>Popular Services</h3>
-      <p>Total {totalPatients.toLocaleString()} Patients</p>
+      <p>Total {totalCount.toLocaleString()} Bookings</p>
+
       <div style={{ marginTop: "20px" }}>
+        {services.length === 0 && <p>No service data available</p>}
+
         {services.map((service) => {
-          const percentage = (service.patients / totalPatients) * 100;
+          const percentage = totalCount
+            ? ((service.count / totalCount) * 100).toFixed(1)
+            : 0;
+
           return (
-            <div key={service.name} style={{ marginBottom: "15px" }}>
+            <div key={service.id} style={{ marginBottom: "15px" }}>
               <div
                 style={{
                   display: "flex",
@@ -28,9 +28,10 @@ const PopularServices = () => {
                   marginBottom: "5px",
                 }}
               >
-                <span>{service.name}</span>
-                <span>{service.patients.toLocaleString()}</span>
+                <span>{service.name}</span> {/* ✅ now shows real name */}
+                <span>{service.count}</span>
               </div>
+
               <div
                 style={{
                   height: "8px",
@@ -44,6 +45,7 @@ const PopularServices = () => {
                     height: "100%",
                     backgroundColor: "#6c63ff",
                     width: `${percentage}%`,
+                    transition: "width 0.3s ease",
                   }}
                 ></div>
               </div>

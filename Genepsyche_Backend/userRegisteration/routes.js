@@ -65,9 +65,9 @@ const updateValidation = [
 
 // Routes
 router.post('/register', registrationValidation, userController.registerUser);
-router.get('/users', userController.getAllUsers);
-router.get('/users/:id', userController.getUserById);
-router.put('/users/:id', updateValidation, userController.updateUser);
-router.delete('/users/:id', userController.deleteUser);
+router.get('/', userController.getAllUsers);
+router.get('/:id', userController.getUserById);
+router.put('/:id', updateValidation, userController.updateUser);
+router.delete('/:id', userController.deleteUser);
 
 module.exports = router;
