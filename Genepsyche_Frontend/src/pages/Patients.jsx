@@ -2,18 +2,24 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import PatientForm from "../components/PatientForm";
 import ShowSelect from "../components/ShowSelect";
+import PatientProfileModal from "../components/PatientProfile";
 
 const API_URL = "http://localhost:3000/api/patients";
 
 const Patients = () => {
   const [patients, setPatients] = useState([]);
+  const [search, setSearch] = useState("");
   const [showForm, setShowForm] = useState(false);
-  const [editingPatient, setEditingPatient] = useState(null); // ✅ NEW
+  const [editingPatient, setEditingPatient] = useState(null);
   const [showItems, setShowItems] = useState(5);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // Fetch all patients when component mounts
+  // ✅ Profile Modal States
+  const [selectedPatient, setSelectedPatient] = useState(null);
+  const [showProfile, setShowProfile] = useState(false);
+
+  // 🧩 Fetch all patients
   useEffect(() => {
     fetchPatients();
   }, []);
@@ -36,11 +42,20 @@ const Patients = () => {
     }
   };
 
+  // ✅ Search Filter
+  const filteredPatients = patients.filter((p) => {
+    const s = search.toLowerCase();
+    return (
+      p.name?.toLowerCase().includes(s) ||
+      p.email?.toLowerCase().includes(s) ||
+      p.phone?.toLowerCase().includes(s)
+    );
+  });
+
   // ✅ Add or Update Patient
   const handleSavePatient = async (patientData) => {
     try {
       if (editingPatient) {
-        // Update existing
         const res = await axios.put(`${API_URL}/${editingPatient.id}`, patientData);
         if (res.data && res.data.data) {
           setPatients((prev) =>
@@ -48,13 +63,11 @@ const Patients = () => {
           );
         }
       } else {
-        // Add new
         const res = await axios.post(API_URL, patientData);
         if (res.data && res.data.data) {
           setPatients([...patients, res.data.data]);
         }
       }
-      // Close form
       setShowForm(false);
       setEditingPatient(null);
     } catch (err) {
@@ -63,13 +76,19 @@ const Patients = () => {
     }
   };
 
-  // ✅ Edit handler
+  // ✅ View Profile
+  const handleView = (patient) => {
+    setSelectedPatient(patient);
+    setShowProfile(true);
+  };
+
+  // ✅ Edit Patient
   const handleEdit = (patient) => {
     setEditingPatient(patient);
     setShowForm(true);
   };
 
-  // ✅ Delete handler
+  // ✅ Delete Patient
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this patient?")) return;
     try {
@@ -82,13 +101,24 @@ const Patients = () => {
   };
 
   return (
-    <div className="patients-page">
-      <div className="page-header">
+    <div className="patients-page p-6">
+      {/* ===== Header Controls ===== */}
+      <div className="page-header flex flex-wrap items-center gap-3 mb-6">
         <ShowSelect value={showItems} onChange={setShowItems} />
+
+        {/* 🔍 Search Input */}
+        <input
+          type="text"
+          placeholder="Search by name, email, or phone..."
+          className="search-input border rounded-lg px-3 py-2 w-64"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
+
         <button
-          className="create-btn"
+          className="create-btn bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
           onClick={() => {
-            setEditingPatient(null); // ✅ reset form for new patient
+            setEditingPatient(null);
             setShowForm(true);
           }}
         >
@@ -96,33 +126,46 @@ const Patients = () => {
         </button>
       </div>
 
+      {/* ===== Table ===== */}
       {loading ? (
         <p>Loading patients...</p>
       ) : error ? (
-        <p className="error-text">{error}</p>
+        <p className="error-text text-red-600">{error}</p>
       ) : (
-        <div className="patients-table">
-          <div className="table-header">
+        <div className="patients-table bg-white rounded-xl shadow-sm overflow-hidden">
+          <div className="table-header grid grid-cols-4 gap-4 px-6 py-3 font-semibold text-gray-700 border-b">
             <div>NAME</div>
             <div>EMAIL</div>
             <div>PHONE</div>
             <div>ACTIONS</div>
           </div>
 
-          {patients.length === 0 ? (
-            <div className="empty-state">No patients found.</div>
+          {filteredPatients.length === 0 ? (
+            <div className="empty-state p-6 text-gray-500">No patients found.</div>
           ) : (
-            patients.slice(0, showItems).map((patient) => (
-              <div key={patient.id} className="table-row">
+            filteredPatients.slice(0, showItems).map((patient) => (
+              <div
+                key={patient.id}
+                className="table-row grid grid-cols-4 gap-4 px-6 py-3 border-b items-center text-gray-800"
+              >
                 <div>{patient.name}</div>
                 <div>{patient.email}</div>
                 <div>{patient.phone}</div>
-                <div>
-                  <button className="action-btn" onClick={() => handleEdit(patient)}>
+                <div className="flex gap-2">
+                  <button
+                    className="action-btn text-blue-600 hover:underline"
+                    onClick={() => handleView(patient)}
+                  >
+                    View
+                  </button>
+                  <button
+                    className="action-btn text-green-600 hover:underline"
+                    onClick={() => handleEdit(patient)}
+                  >
                     Edit
                   </button>
                   <button
-                    className="action-btn delete"
+                    className="action-btn text-red-600 hover:underline"
                     onClick={() => handleDelete(patient.id)}
                   >
                     Delete
@@ -134,14 +177,23 @@ const Patients = () => {
         </div>
       )}
 
+      {/* ===== View Profile Modal ===== */}
+      {showProfile && (
+        <PatientProfileModal
+          patient={selectedPatient}
+          onClose={() => setShowProfile(false)}
+        />
+      )}
+
+      {/* ===== Create/Edit Patient Form ===== */}
       {showForm && (
         <PatientForm
           onClose={() => {
             setShowForm(false);
             setEditingPatient(null);
           }}
-          onSave={handleSavePatient} // ✅ renamed to onSave
-          patient={editingPatient} // ✅ pass selected patient for edit
+          onSave={handleSavePatient}
+          patient={editingPatient}
         />
       )}
     </div>
