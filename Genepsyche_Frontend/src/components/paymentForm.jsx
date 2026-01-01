@@ -99,12 +99,12 @@ const CreatePaymentForm = ({ onClose, onCreatePayment, isOpen }) => {
     <div className="modal-overlay">
       <div className="modal">
         {/* Header */}
-        <div className="modal-header">
+        
           <h2>Create Payment</h2>
           <button className="close-btn" onClick={onClose}>
             ×
           </button>
-        </div>
+       
 
         {/* Form */}
         <form onSubmit={handleSubmit}>
